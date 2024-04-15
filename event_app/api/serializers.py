@@ -58,6 +58,7 @@ class EventSerializer(serializers.ModelSerializer):
     subevents = SubeventSerializer(many=True, read_only=True)
     participant_count = serializers.SerializerMethodField()
     my_participation = serializers.SerializerMethodField()
+    event_status = serializers.SerializerMethodField()
     registration_status = serializers.SerializerMethodField()
     format = serializers.SerializerMethodField()
     photos = PhotoSerializer(many=True, read_only=True)
@@ -69,6 +70,9 @@ class EventSerializer(serializers.ModelSerializer):
 
     def get_registration_status(self, obj):
         return obj.get_registration_status_display()
+    
+    def get_event_status(self, obj):
+        return obj.get_event_status_display()
     
     def get_format(self, obj):
         return obj.get_format_display()

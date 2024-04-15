@@ -40,7 +40,7 @@ class Event(models.Model):
     EVENT_STATUS_CHOICES = [
             ('on_time', 'По расписанию'),
             ('scheduled', 'Запланировано'),
-            ('cancelled', 'Отменено'),
+            ('canceled', 'Отменено'),
         ]
 
     REGISTRATION_STATUS_CHOICES = [

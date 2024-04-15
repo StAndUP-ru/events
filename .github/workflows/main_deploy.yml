@@ -1,25 +1,13 @@
-name: Event backend deploy
+name: Event deploy
 
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
 
-  dispatch:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Push to repo
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.PAT }}
-          repository: "StAndUP-ru/funtech"
-          event-type: update_remote
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "events", "branch": "develop"}'
-
   build_and_push_to_docker_hub:
-    needs: [dispatch]
     name: Build and Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
@@ -38,3 +26,15 @@ jobs:
           context: ./
           push: true
           tags: ${{ vars.DOCKER_USERNAME }}/event:latest
+
+  dispatch:
+    needs: [build_and_push_to_docker_hub]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push to repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: "StAndUP-ru/funtech"
+          event-type: update_remote
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "events", "branch": "develop"}'

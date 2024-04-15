@@ -29,8 +29,8 @@ class TestEventViewTestCase(TestCase):
         self.assertEqual(len(response.json()['results']), 2)
         self.assertEqual(response.json()['results'][0]['title'], 'Test event future 1')
         self.assertEqual(response.json()['results'][1]['title'], 'Test event future 2')
-        self.assertEqual(response.json()['results'][0]['event_status'], 'on_time')
-        self.assertEqual(response.json()['results'][1]['event_status'], 'on_time')
+        self.assertEqual(response.json()['results'][0]['event_status'], 'По расписанию')
+        self.assertEqual(response.json()['results'][1]['event_status'], 'По расписанию')
         self.assertLessEqual(response.json()['results'][0]['datetime'],
                                 response.json()['results'][1]['datetime'])
 
@@ -40,8 +40,8 @@ class TestEventViewTestCase(TestCase):
         self.assertEqual(len(response.json()['results']), 2)
         self.assertEqual(response.json()['results'][0]['title'], 'Test event past 2')
         self.assertEqual(response.json()['results'][1]['title'], 'Test event past 1')
-        self.assertEqual(response.json()['results'][0]['event_status'], 'on_time')
-        self.assertEqual(response.json()['results'][1]['event_status'], 'on_time')
+        self.assertEqual(response.json()['results'][0]['event_status'], 'По расписанию')
+        self.assertEqual(response.json()['results'][1]['event_status'], 'По расписанию')
         self.assertGreaterEqual(response.json()['results'][0]['datetime'],
                                 response.json()['results'][1]['datetime'])
 
@@ -50,14 +50,14 @@ class TestEventViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['results']), 1)
         self.assertEqual(response.json()['results'][0]['title'], 'Test event scheduled')
-        self.assertEqual(response.json()['results'][0]['event_status'], 'scheduled')
+        self.assertEqual(response.json()['results'][0]['event_status'], 'Запланировано')
 
     def test_event_list_url_canceled(self):
         response = self.client.get('/api/v1/events/?status=canceled')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['results']), 1)
         self.assertEqual(response.json()['results'][0]['title'], 'Test event canceled')
-        self.assertEqual(response.json()['results'][0]['event_status'], 'canceled')
+        self.assertEqual(response.json()['results'][0]['event_status'], 'Отменено')
 
 
 class TestSubeventViewTestCase(TestCase):
@@ -65,15 +65,15 @@ class TestSubeventViewTestCase(TestCase):
     def setUpTestData(cls):
         EventFactory.create()
         SpeakerFactory.create()
-        event = Event.objects.first()
+        cls.event = Event.objects.first()
         speaker = Speaker.objects.first()
-        SubeventFactory.create(title='Custom subevent', event=event, speaker=speaker)
+        SubeventFactory.create(title='Custom subevent', event=cls.event, speaker=speaker)
 
     def setUp(self):
         self.client = Client()
 
     def test_subevent_list_url(self):
-        response = self.client.get('/api/v1/events/1/subevents/')
+        response = self.client.get(f'/api/v1/events/{self.event.id}/subevents/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
         self.assertEqual(response.json()[0]['title'], 'Custom subevent')
@@ -90,7 +90,7 @@ class TestSubeventViewTestCase(TestCase):
         self.assertIn('www.testphoto.org', response.json()[0]['photo'])
 
 
-class SpeakerViewTestCase(TestCase):
+class TestSpeakerViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         SpeakerFactory.create()
@@ -112,7 +112,7 @@ class SpeakerViewTestCase(TestCase):
         self.assertIn('www.testphoto.org', response.json()[0]['photo'])
 
 
-class EventRegistrationViewTestCase(TestCase):
+class TestEventRegistrationViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         EventFactory.create()
@@ -133,21 +133,21 @@ class EventRegistrationViewTestCase(TestCase):
         self.admin_token = request_user_token(self.client, 'adminuser@example.com')
 
     def test_event_registration_list_authorizing(self):
-        response = self.client.get('/api/v1/events/1/registrations/')
+        response = self.client.get(f'/api/v1/events/{self.event.id}/registrations/')
         self.assertEqual(response.status_code, 401)
 
     def test_event_registration_url(self):
-        response = self.client.get('/api/v1/events/1/registrations/', HTTP_AUTHORIZATION=f'Token {self.notparticipant_token}')
+        response = self.client.get(f'/api/v1/events/{self.event.id}/registrations/', HTTP_AUTHORIZATION=f'Token {self.notparticipant_token}')
         self.assertEqual(response.status_code, 200)
 
     def test_user_sees_only_own_registration(self):
-        response = self.client.get('/api/v1/events/1/registrations/', HTTP_AUTHORIZATION=f'Token {self.participant_token}')
+        response = self.client.get(f'/api/v1/events/{self.event.id}/registrations/', HTTP_AUTHORIZATION=f'Token {self.participant_token}')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['count'], 1)
         self.assertEqual(response.json()['results'][0]['participant'], 'participant@example.com')
 
     def test_admin_sees_all_registrations(self):
-        response = self.client.get('/api/v1/events/1/registrations/', HTTP_AUTHORIZATION=f'Token {self.admin_token}')
+        response = self.client.get(f'/api/v1/events/{self.event.id}/registrations/', HTTP_AUTHORIZATION=f'Token {self.admin_token}')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['count'], 2)
         self.assertEqual(response.json()['results'][0]['participant'], 'participant@example.com')
@@ -156,12 +156,12 @@ class EventRegistrationViewTestCase(TestCase):
     def test_event_registration_create_fail_not_full_profile(self):
         User.objects.create_user(email="notfulldata@example.com", password="usertestpasSW1#", is_active=True)
         user_token = request_user_token(self.client, 'notfulldata@example.com')
-        response = self.client.post('/api/v1/events/1/registrations/', HTTP_AUTHORIZATION=f'Token {user_token}')
+        response = self.client.post(f'/api/v1/events/{self.event.id}/registrations/', HTTP_AUTHORIZATION=f'Token {user_token}')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()[0], 'Заполните все поля профиля')
 
     def test_event_registration_create_success(self):
-        response = self.client.post('/api/v1/events/1/registrations/', HTTP_AUTHORIZATION=f'Token {self.notparticipant_token}')
+        response = self.client.post(f'/api/v1/events/{self.event.id}/registrations/', HTTP_AUTHORIZATION=f'Token {self.notparticipant_token}')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['participant'], 'notparticipant@example.com')
         self.assertEqual(response.json()['event'], Event.objects.first().__str__())

@@ -62,16 +62,19 @@ class Command(BaseCommand):
                 datetime=self._get_random_datetime(upcoming),
                 format='online',
                 event_status='on_time',
+                registration_status='open' if upcoming else 'closed',
+                organizer_name = 'Organizer',
+                organizer_contacts = 'Organizer contacts',
                 participant_limit=randint(10, 10000),
                 location_address='Moscow, Arbat street, 1',
                 location_coordinates='55.733836, 37.588140',
                 image='Image',
-                host_photo='Host photo',
+                host_photo='Host_photo',
                 host_full_name=choice(self.NAMES) + ' ' + choice(self.SURNAMES),
                 host_contacts=f'No contacts',
                 host_company=choice(self.COMPANIES),
                 host_position=choice(self.POSITION),
-                event_link='Event link',
+                event_link='funtech.b2k.org/somevent',
             )
             self._create_subevents_with_speakers(event, subevents_count)
 

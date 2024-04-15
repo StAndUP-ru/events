@@ -91,7 +91,7 @@ class UserApiUpdateTestCase(TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_get_only_own_user(self):
-        response = self.client.get('/api/v1/users/1/', HTTP_AUTHORIZATION=f'Token {self.token}')
+        response = self.client.get(f'/api/v1/users/{self.user_id}/', HTTP_AUTHORIZATION=f'Token {self.token}')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['email'], self.user_data['email'])
 

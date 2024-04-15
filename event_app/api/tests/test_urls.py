@@ -47,21 +47,24 @@ class TestUrls(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.event_id = Event.objects.first().id
+        self.speaker_id = Speaker.objects.first().id
+        self.subevent_id = Subevent.objects.first().id
 
     def test_event_list_url(self):
         response = self.client.get('/api/v1/events/')
         self.assertEqual(response.status_code, 200)
 
     def test_event_detail_url(self):
-        response = self.client.get('/api/v1/events/1/')
+        response = self.client.get(f'/api/v1/events/{self.event_id}/')
         self.assertEqual(response.status_code, 200)
 
     def test_subevent_list_url(self):
-        response = self.client.get('/api/v1/events/1/subevents/')
+        response = self.client.get(f'/api/v1/events/{self.event_id}/subevents/')
         self.assertEqual(response.status_code, 200)
 
     def test_subevent_detail_url(self):
-        response = self.client.get('/api/v1/events/1/subevents/1/')
+        response = self.client.get(f'/api/v1/events/{self.event_id}/subevents/{self.subevent_id}/')
         self.assertEqual(response.status_code, 200)
 
     def test_speaker_list_url(self):
@@ -69,5 +72,5 @@ class TestUrls(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_speaker_detail_url(self):
-        response = self.client.get('/api/v1/speakers/1/')
+        response = self.client.get(f'/api/v1/speakers/{self.speaker_id}/')
         self.assertEqual(response.status_code, 200)
