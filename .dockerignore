@@ -1,0 +1,13 @@
+.git/
+.github/
+.vscode/
+.mypy_cache/
+.pytest_cache/
+venv/
+db.sqlite3
+debug_db.sqlite3
+infra/
+static/
+media/
+README.md
+LICENSE
