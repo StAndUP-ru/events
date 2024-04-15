@@ -1,2 +1,2 @@
 To run tests:
-pytest event_app -s
+pytest event_app
