@@ -1,8 +1,10 @@
+from django.core.mail import send_mail
+from django.core.validators import RegexValidator
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from django.core.validators import RegexValidator
 
 from events.models import Event, EventRegistration, Photo, Speaker, Subevent
+from event_app.settings import DEFAULT_FROM_EMAIL
 
 
 class SpeakerSerializer(serializers.ModelSerializer):
@@ -111,6 +113,23 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
         current_count = EventRegistration.objects.filter(event=validated_data['event']).count()
         if current_count >= validated_data['event'].participant_limit:
             raise serializers.ValidationError('Достигнуто максимальное количество участников')
+        msg_place = ("Событие пройдет онлайн\nДоступ по ссылке в описании события" 
+                     if validated_data['event'].format == 'online'
+                     else f"Место проведения: {validated_data['event'].location_address}")
+        message=(f'Рады подтвердить ваше участие в предстоящем событии {validated_data["event"]}\n'
+                 f'Дата: {validated_data["event"].datetime.strftime("%d.%m.%Y")}\n'
+                 f'Время: {validated_data["event"].datetime.strftime("%H:%M")}\n'
+                 f'{msg_place}\n\n'
+                 f'Ссылка на событие: {validated_data["event"].event_link}\n\n'
+                 f'С нетерпением ждем вас!\n\n'
+                 f'С уважением, команда {validated_data["event"].organizer_name}'
+                 )
+        send_mail(
+            subject=f'Подтверждение участия в событии {validated_data["event"]}',
+            message=message,
+            from_email=DEFAULT_FROM_EMAIL,
+            recipient_list=[validated_data['participant'].email],
+            fail_silently=False,)
         return EventRegistration.objects.create(approved=True, **validated_data) # Stub for now
     
     def validate(self, attrs):
