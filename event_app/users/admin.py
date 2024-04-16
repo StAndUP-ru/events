@@ -26,7 +26,15 @@ class UserAdmin(DefaultUserAdmin):
                                              'consent_vacancy_data_date',
                                              'consent_random_coffee'),
                                              ('is_active', 'date_joined'), 'profile_full', 'password', 'is_staff', 'groups')}),)
-    
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password1", "password2"),
+            },
+        ),
+    )    
     readonly_fields = ('date_joined', 'profile_full')
     search_fields = ('email__startswith', 'full_name')
     ordering = ('id',)
