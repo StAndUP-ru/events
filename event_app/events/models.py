@@ -115,6 +115,12 @@ class Event(models.Model):
         blank=True,
         null=True
     )
+    banner = models.ImageField(
+        upload_to='events/banner/',
+        verbose_name='Баннер события',
+        blank=True,
+        null=True
+    )
     published_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации'
@@ -143,7 +149,9 @@ class Event(models.Model):
     )
     event_link = models.URLField(
         max_length=200,
-        verbose_name='Ссылка на событие'
+        verbose_name='Ссылка на событие',
+        blank=True,
+        null=True
     )
     recording_link = models.URLField(
         max_length=200,
@@ -260,8 +268,8 @@ class Subevent(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Часть программы события'
-        verbose_name_plural = 'Части программы события'
+        verbose_name = 'Программа события'
+        verbose_name_plural = 'Программы событий'
 
     def __str__(self):
         return self.title

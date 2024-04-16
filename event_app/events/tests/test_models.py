@@ -1,5 +1,5 @@
 from django.db.utils import IntegrityError
-from django.test import Client, TestCase
+from django.test import TestCase
 
 from events.admin import EventAdmin
 from events.models import Event, EventRegistration, Photo, Speaker, Subevent
@@ -318,10 +318,10 @@ class SubeventModelTest(TestCase):
         self.assertEqual(field_label, 'Спикер, участвующий в программе')
 
     def test_verbose_name(self):
-        self.assertEqual(str(Subevent._meta.verbose_name), 'Часть программы события')
+        self.assertEqual(str(Subevent._meta.verbose_name), 'Программа события')
 
     def test_verbose_name_plural(self):
-        self.assertEqual(str(Subevent._meta.verbose_name_plural), 'Части программы события')
+        self.assertEqual(str(Subevent._meta.verbose_name_plural), 'Программы событий')
 
     def test_str(self):
         expected_str = self.subevent.title

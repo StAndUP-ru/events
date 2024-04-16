@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'djoser',
     'events.apps.EventsConfig',
     'drf_yasg',
+    'admin_reorder',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
 ]
 
 ROOT_URLCONF = 'event_app.urls'
@@ -125,23 +127,14 @@ DJOSER = {
         'password_reset': 'core.email_djoser.PasswordResetEmail',
         'password_changed_confirmation': 'core.email_djoser.PasswordConfirmationEmail',
     },
-    # 'ACTIVATION_URL': 'activate/?uid={uid}&token={token}',
     'ACTIVATION_URL': 'signin?uid={uid}&token={token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SEND_CONFIRMATION_EMAIL': True,
     'LOGIN_FIELD': 'email',
-    # 'PERMISSIONS': {
-    #     'user': ['rest_framework.permissions.IsAuthenticated'],
-    # },
     'SERIALIZERS': {
-        # тут нужен сериализатор для активации
-        # 'activation': 'users.serializers.CustomActivationSerializer',
         'user': 'users.serializers.CustomUserSerializer',
         'current_user': 'users.serializers.CustomUserSerializer',
     },
-    # 'CONSTANTS': {
-    #     'messages': 'api.constants.DjoserMessages',
-    # },
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
 }
 
@@ -175,3 +168,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', 'redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_BROKER', 'redis://localhost:6379/0')
 WEEKLY_SUBJECT = os.environ.get('WEEKLY_SUBJECT', 'Еженедельная рассылка Event')
+
+ADMIN_REORDER = (
+    {'app': 'events', 'models': ('events.Event',
+                                 'events.Subevent',
+                                 'events.Speaker',
+                                 'events.Photo',
+                                 'events.EventRegistration',)},
+    'users',
+    'auth',
+    'authtoken',
+)
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+}

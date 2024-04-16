@@ -8,9 +8,16 @@ class EventRegistrationInline(admin.options.InlineModelAdmin):
     model = EventRegistration
     extra = 0
 
+
 class PhotoInline(admin.options.InlineModelAdmin):
     template = 'admin/edit_inline/yandex_events_inline.html'
     model = Photo
+    extra = 0
+
+
+class SubeventInline(admin.options.InlineModelAdmin):
+    template = 'admin/edit_inline/yandex_events_inline.html'
+    model = Subevent
     extra = 0
 
 
@@ -33,7 +40,8 @@ class EventAdmin(admin.ModelAdmin):
             'classes': ('collapse', 'wide'),
             'fields': (('organizer_name', 'organizer_contacts'),
                        ('registration_status', 'description'),
-                       ('datetime', 'format', 'participant_limit'), 'image')
+                       ('datetime', 'format', 'participant_limit'),
+                       ('image', 'banner'))
         }),
         ('Место проведения', {
             'classes': ('collapse', 'wide'),
@@ -54,7 +62,7 @@ class EventAdmin(admin.ModelAdmin):
         }),
     )
     list_display_links = ('title',)
-    inlines = (PhotoInline, EventRegistrationInline,)
+    inlines = (PhotoInline, SubeventInline, EventRegistrationInline,)
 
     @admin.display(description='Зарегистрированные участники')
     def registered(self, obj):
@@ -75,7 +83,7 @@ class SubeventAdmin(admin.ModelAdmin):
         'time'
     )
     fieldsets = (
-        ('Темы события', {'fields': ('title', 'time', 'event', 'speaker')}),
+        ('Программа события', {'fields': ('title', 'time', 'event', 'speaker')}),
     )
     list_display_links = ('title',)
     ordering = ('id',)
