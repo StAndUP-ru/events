@@ -55,7 +55,7 @@ class EventSerializer(serializers.ModelSerializer):
     '''
     Сериализатор для мероприятия.
     '''
-    subevents = SubeventSerializer(many=True, read_only=True)
+    subevents = serializers.SerializerMethodField()
     participant_count = serializers.SerializerMethodField()
     my_participation = serializers.SerializerMethodField()
     event_status = serializers.SerializerMethodField()
@@ -67,6 +67,13 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         exclude = ['participants']
+
+    def get_subevents(self, obj):
+        ordered_queryset = obj.subevents.order_by('time')
+        return SubeventSerializer(ordered_queryset,
+                                  many=True,
+                                  read_only=True,
+                                  context=self.context).data
 
     def get_registration_status(self, obj):
         return obj.get_registration_status_display()
