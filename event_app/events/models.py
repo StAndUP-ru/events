@@ -283,7 +283,7 @@ class EventRegistration(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='registrations',
-        verbose_name='Пользователь, зарегистрировавшийся на событие',
+        verbose_name='Участник события',
         null=False, blank=False
     )
     registration_date = models.DateTimeField(

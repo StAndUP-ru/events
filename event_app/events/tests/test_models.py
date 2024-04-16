@@ -176,7 +176,7 @@ class EventRegistrationModelTest(TestCase):
 
     def test_participant_label(self):
         field_label = self.event_registration._meta.get_field('participant').verbose_name
-        self.assertEqual(field_label, 'Пользователь, зарегистрировавшийся на событие')
+        self.assertEqual(field_label, 'Участник события')
 
     def test_approved_label(self):
         field_label = self.event_registration._meta.get_field('approved').verbose_name
