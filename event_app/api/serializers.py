@@ -120,6 +120,8 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
         current_count = EventRegistration.objects.filter(event=validated_data['event']).count()
         if current_count >= validated_data['event'].participant_limit:
             raise serializers.ValidationError('Достигнуто максимальное количество участников')
+        if validated_data['event'].registration_status != 'open':
+            raise serializers.ValidationError('Регистрация на это мероприятие невозможна в данный момент')
         msg_place = ("Событие пройдет онлайн\nДоступ по ссылке в описании события" 
                      if validated_data['event'].format == 'online'
                      else f"Место проведения: {validated_data['event'].location_address}")
