@@ -15,7 +15,6 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
 
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', default='http://*').split()
 CSRF_TRUSTED_ORIGINS.extend(os.getenv('CSRF_TRUSTED_ORIGINS', default='https://*').split())
-# CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', default='http://*').split()
 CORS_ORIGIN_ALLOW_ALL = os.getenv('CORS_ORIGIN_ALLOW_ALL', default='True').lower() == 'true'
 CORS_URLS_REGEX = os.getenv('CORS_URLS_REGEX', default='^/api/.*$')
 

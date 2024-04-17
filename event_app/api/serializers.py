@@ -93,8 +93,15 @@ class EventSerializer(serializers.ModelSerializer):
     def get_my_participation(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return EventRegistration.objects.filter(event=obj, participant=user).exists()
-        return "Not authenticated"
+            queryset = EventRegistration.objects.filter(event=obj, participant=user)
+            if queryset.exists():
+                return {"result": True,
+                        "detailed_result": "Registered",
+                        "data": EventRegistrationSerializer(queryset.first()).data}
+            return {"result": False,
+                    "detailed_result": "Not registered"}
+        return {"result": False,
+                "detailed_result": "Not authenticated"}
 
 
 class EventRegistrationSerializer(serializers.ModelSerializer):

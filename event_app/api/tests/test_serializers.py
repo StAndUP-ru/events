@@ -33,7 +33,8 @@ class TestEventViewTestCase(TestCase):
         event = Event.objects.first()
         response = self.client.get(f'/api/v1/events/{event.id}/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['my_participation'], 'Not authenticated')
+        self.assertFalse(response.json()['my_participation']['result'])
+        self.assertEqual(response.json()['my_participation']['detailed_result'], 'Not authenticated')
 
     def test_event_my_participation_no_registration(self):
         event = Event.objects.first()
@@ -42,7 +43,8 @@ class TestEventViewTestCase(TestCase):
         user_token = request_user_token(self.client, 'notparticipant@example.com')
         response = self.client.get(f'/api/v1/events/{event.id}/', HTTP_AUTHORIZATION=f'Token {user_token}')
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.json()['my_participation'])
+        self.assertFalse(response.json()['my_participation']['result'])
+        self.assertEqual(response.json()['my_participation']['detailed_result'], 'Not registered')
 
     def test_event_my_participation_with_registration(self):
         event = Event.objects.first()
@@ -52,7 +54,9 @@ class TestEventViewTestCase(TestCase):
         self.client.post(f'/api/v1/events/{event.id}/registrations/', HTTP_AUTHORIZATION=f'Token {user_token}')
         response = self.client.get(f'/api/v1/events/{event.id}/', HTTP_AUTHORIZATION=f'Token {user_token}')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()['my_participation'])
+        self.assertTrue(response.json()['my_participation']['result'])
+        self.assertEqual(response.json()['my_participation']['detailed_result'], 'Registered')
+        self.assertEqual(response.json()['my_participation']['data']['participant'], 'participant@example.com')
 
 
 class TestEventRegistrationViewTestCase(TestCase):
